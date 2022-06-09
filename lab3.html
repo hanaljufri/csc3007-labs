@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .country{
+            fill:grey;
+            stroke:white;
+            stroke-width:0;
+        }
+        .country.selected{
+            fill:red;
+            stroke:purple;
+            stroke-width:3px;
+        }
+    </style>
+</head>
+<body>
+    <svg></svg>
+    <div class="tooltip"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        let width = 1000, height = 600;
+
+let svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Map and projection
+let projection = d3.geoEquirectangular()
+projection.center([103.8198, 1.3521]) // London's longitude / latitude;
+projection.scale(500)
+let geopath = d3.geoPath().projection(projection);
+
+// Load GeoJSON data
+d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then(data => {
+
+    // Draw the map
+    svg.append("g")
+        .attr("id", "countries")
+        .selectAll("path")
+        .data(data.features)
+        .enter()
+        .append("path")
+            .attr("d",  d => geopath(d))
+            .attr("fill", "#777")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5)
+
+.on("mouseover", (event, d) => {
+    d3.select(".tooltip")
+    .text(d.properties.name)
+    .style("position", "absolute")
+    .style("background", "#fff")
+    .style("left", (event.pageX) + "px")
+    .style("top", (event.pageY) + "px");
+
+    d3.select(event.currentTarget)
+    .style("stroke","red")
+    .style("stroke-width",10);
+})
+.on("mouseout", (event, d) => {
+    d3.select(".tooltip")
+    .text("");
+
+    d3.selected(event.currentTarget)
+    .style(selected,false);
+})
+})
+    </script>
+</body>
+</html>
